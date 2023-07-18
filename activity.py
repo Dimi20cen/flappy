@@ -56,12 +56,7 @@ class Activity(activity.Activity):
                 button = RadioToolButton(icon_name=icon_name)
             self._levels_buttons.append(button)
 
-            def callback(source):
-                if source.get_active():
-                    self.game.set_level(numeric_level)
-                    self.game.run()
-
-            button.connect('clicked', callback)
+            button.connect('clicked', self.button_clicked_cb, numeric_level)
             button.set_tooltip(tooltip)
 
         add_level_button('male-7', _("Hard"), 3)
@@ -70,6 +65,7 @@ class Activity(activity.Activity):
 
         for button in self._levels_buttons[::-1]:
             toolbar_box.toolbar.insert(button, -1)
+            button.show()
 
         separator2 = Gtk.SeparatorToolItem()
         separator2.props.draw = True
@@ -78,9 +74,10 @@ class Activity(activity.Activity):
         separator2.show()
 
         button = ToolButton('speaker-muted-100')
+        toolbar_box.toolbar.insert(button, -1)
         button.set_tooltip(_('Sound'))
         button.connect('clicked', self.sound_control)
-        toolbar_box.toolbar.insert(button, -1)
+        button.show()
 
         separator3 = Gtk.SeparatorToolItem()
         separator3.props.draw = False
@@ -94,7 +91,7 @@ class Activity(activity.Activity):
 
         self.set_toolbar_box(toolbar_box)
         toolbar_box.show()
-        self.show_all()
+        #self.show_all()
 
     def sound_control(self, button):
         self.sound = not self.sound
@@ -105,3 +102,7 @@ class Activity(activity.Activity):
         else:
             button.set_icon_name('speaker-muted-100')
             button.set_tooltip(_('Sound'))
+
+    def button_clicked_cb(self, button, numeric_level):
+        self.game.set_level(numeric_level)
+        self.game.run()

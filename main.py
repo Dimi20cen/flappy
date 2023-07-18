@@ -62,6 +62,10 @@ class Flappy():
         self.sound = True
         self._factor = 1  # Default: 1 for hard
 
+        pygame.display.init()
+        pygame.font.init()
+        self.clock = pygame.time.Clock()
+
     def increment_score(self):
         self.score = self.score + 1
         self.currentS.set_score(self.score)
@@ -70,8 +74,8 @@ class Flappy():
 
     def load_all(self):
         self.hit_flag = False
-        self.game_w = GAME_SIZE[0]
-        self.game_h = GAME_SIZE[1]
+        self.game_w = self.screen.get_width()
+        self.game_h = self.screen.get_height()
         self.floor_y = self.game_h - FLOOR_Y
         self.bird_x = self.game_w / 3 - FLOOR_Y
         self.bird_y = self.game_h / 2
@@ -130,27 +134,13 @@ class Flappy():
         return sprite1.mask.overlap(sprite2.mask, offset) is not None
 
     def run(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
-            elif event.type == pygame.VIDEORESIZE:
-                pygame.display.set_mode(
-                    (event.size[0], event.size[1] - GRID_CELL_SIZE),
-                    pygame.RESIZABLE)
-                break
-        pygame.display.init()
-        pygame.font.init()
-        self.clock = pygame.time.Clock()
+
         self.screen = pygame.display.get_surface()
-        if self.screen:
-            w = self.screen.get_width()
-            h = self.screen.get_height()
-            global GAME_SIZE
-            GAME_SIZE = [w, h]
-        else:
-            self.screen = pygame.display.set_mode(GAME_SIZE)
-            pygame.display.set_caption('Flappy')
+
+
+        pygame.display.set_caption('Flappy')
         self.sound_enable = True
+
         try:
             pygame.mixer.init()
             self._snd_pipe = pygame.mixer.Sound('data/sounds/pipe.ogg')
@@ -161,8 +151,19 @@ class Flappy():
             self._snd_hit.set_volume(0.15)
         except BaseException:
             self.sound_enable = False
+
         self.load_all()
         self.state = INIT
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return
+            elif event.type == pygame.VIDEORESIZE:
+                pygame.display.set_mode(
+                    (event.size[0], event.size[1] - GRID_CELL_SIZE),
+                    pygame.RESIZABLE)
+                break
+
         self.running = True
         while self.running:
             while Gtk.events_pending():
